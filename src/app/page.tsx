@@ -91,12 +91,7 @@ export default function Home() {
                 />
                 <button
                   type="submit"
-                  className="cursor-pointer px-6 py-3 
-             bg-blue-800 text-white 
-             hover:bg-blue-400 
-             dark:bg-white dark:text-black 
-             dark:hover:bg-gray-400 
-             rounded-lg transition"
+                  className="cursor-pointer bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-3 rounded-xl font-medium shadow-md transition-all"
                 >
                   {editIndex !== null ? "Update" : "Tambah"}
                 </button>
