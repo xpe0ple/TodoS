@@ -34,9 +34,16 @@ export default function Navbar() {
           <div className="flex-shrink-0">
             <Link
               href="/"
-              className="text-2xl font-bold text-gray-900 dark:text-white"
+              className="
+      text-2xl font-bold 
+      bg-gradient-to-r 
+      from-pink-300 via-pink-500 to-fuchsia-600 
+      dark:from-red-600 dark:via-red-400 dark:to-neutral-800
+
+      bg-clip-text text-transparent
+    "
             >
-              X
+              Gwen Stacy
             </Link>
           </div>
 
