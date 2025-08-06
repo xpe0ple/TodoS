@@ -50,8 +50,9 @@ export default function AIAssistant({
   return (
     <div className="bg-white/10 dark:bg-white/5 backdrop-blur-sm border border-gray-200/20 dark:border-gray-800 text-black dark:text-white p-6 rounded-2xl mt-6 shadow-xl transition-all duration-300 max-w-2xl mx-auto">
       <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-        🤖 <span>AI Task Assistant</span>
+        🕸 <span>AI Task Assistant</span>
       </h2>
+
       <form
         onSubmit={(e) => {
           e.preventDefault(); // mencegah reload halaman
@@ -68,7 +69,13 @@ export default function AIAssistant({
         />
         <button
           type="submit"
-          className="cursor-pointer bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-3 rounded-xl font-medium shadow-md transition-all"
+          className="cursor-pointer 
+    bg-gradient-to-r 
+    from-pink-300 via-pink-500 to-fuchsia-600 
+    dark:from-red-600 dark:via-red-400 dark:to-neutral-800
+    hover:brightness-110
+    text-white px-6 py-3 rounded-xl font-semibold 
+    shadow-md transition-all duration-300"
         >
           🚀 Kirim
         </button>

@@ -4,6 +4,7 @@ import "./globals.css";
 import React, { useEffect, useState } from "react";
 import { PencilSquareIcon, TrashIcon } from "@heroicons/react/24/outline";
 import AIAssistant from "./components/ai-assistant";
+import { PencilLine, Trash2 } from "lucide-react";
 
 interface Todo {
   text: string;
@@ -15,6 +16,7 @@ export default function Home() {
   const [input, setInput] = useState("");
   const [editIndex, setEditIndex] = useState<number | null>(null);
   const [aiResponded, setAiResponded] = useState(false);
+  const [showTodo, setShowTodo] = useState(false);
 
   useEffect(() => {
     try {
@@ -71,8 +73,23 @@ export default function Home() {
       <AIAssistant onAIResponded={() => setAiResponded(true)} />
       <main className="max-w-7xl mx-auto px-4 py-12">
         <div className="text-center">
+          {!aiResponded && !showTodo && (
+            <div className="flex justify-center my-8">
+              <button
+                onClick={() => setShowTodo(true)}
+                className="cursor-pointer 
+      bg-gradient-to-r 
+      from-pink-300 via-pink-500 to-fuchsia-600 
+      dark:from-red-600 dark:via-red-400 dark:to-neutral-800
+      text-white px-6 py-3 rounded-xl font-semibold 
+      shadow-md transition-all duration-300 hover:brightness-110"
+              >
+                Daftar To-Do
+              </button>
+            </div>
+          )}
           {/* Elemen H1 dan P hanya muncul setelah AI direspon */}
-          {aiResponded && (
+          {(aiResponded || showTodo) && (
             <>
               <h1 className="text-4xl font-bold mb-4 text-gray-900 dark:text-white">
                 Menjadi lebih baik
@@ -84,7 +101,7 @@ export default function Home() {
             </>
           )}
 
-          {aiResponded && (
+          {(aiResponded || showTodo) && (
             <div className="max-w-3xl mx-auto">
               <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
                 <h3 className="text-xl font-semibold mb-4">
@@ -103,7 +120,11 @@ export default function Home() {
                   />
                   <button
                     type="submit"
-                    className="cursor-pointer bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-3 rounded-xl font-medium shadow-md transition-all"
+                    className="cursor-pointer bg-gradient-to-r 
+    from-pink-300 via-pink-500 to-fuchsia-600 
+    dark:from-red-600 dark:via-red-400 dark:to-neutral-800
+    text-white px-6 py-3 rounded-xl font-semibold shadow-md 
+    transition-all duration-300 hover:brightness-110"
                   >
                     {editIndex !== null ? "Update" : "Tambah"}
                   </button>
@@ -134,17 +155,18 @@ export default function Home() {
                     <div className="flex gap-2">
                       <button
                         onClick={() => handleEdit(index)}
-                        className="text-blue-500 hover:text-blue-700 transition flex items-center gap-1"
+                        className="flex items-center gap-2 px-3 py-2 rounded-md border border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white transition"
                       >
-                        <PencilSquareIcon className="h-5 w-5" />
-                        <span className="cursor-pointer text-sm">Edit</span>
+                        <PencilLine className="w-4 h-4" />
+                        <span className="text-sm font-medium">Edit</span>
                       </button>
+
                       <button
                         onClick={() => handleDelete(index)}
-                        className="text-red-500 hover:text-red-700 transition flex items-center gap-1"
+                        className="flex items-center gap-2 px-3 py-2 rounded-md border border-red-500 text-red-500 hover:bg-red-500 hover:text-white transition"
                       >
-                        <TrashIcon className="h-5 w-5" />
-                        <span className="cursor-pointer text-sm">Hapus</span>
+                        <Trash2 className="w-4 h-4" />
+                        <span className="text-sm font-medium">Hapus</span>
                       </button>
                     </div>
                   </li>

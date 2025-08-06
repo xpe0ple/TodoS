@@ -28,9 +28,13 @@ export default function Todo() {
           />
           <button
             onClick={addTodo}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+            className="bg-gradient-to-r 
+    from-pink-300 via-pink-500 to-fuchsia-600 
+    dark:from-red-600 dark:via-red-400 dark:to-neutral-800
+    text-white px-5 py-2.5 rounded-xl font-semibold 
+    shadow-md hover:brightness-110 transition-all duration-300"
           >
-            Tambah
+            ➕ Tambah
           </button>
         </div>
 
