@@ -12,7 +12,6 @@ interface Todo {
   completed: boolean;
 }
 
-// Enhanced animation variants
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
@@ -82,7 +81,6 @@ export default function Home() {
       if (storedTodos) {
         const parsed = JSON.parse(storedTodos);
         if (Array.isArray(parsed)) {
-          // Add IDs to existing todos if they don't have them
           const todosWithIds = parsed.map((todo, index) => ({
             ...todo,
             id: todo.id || `todo-${Date.now()}-${index}`,
@@ -198,181 +196,194 @@ export default function Home() {
           <AnimatePresence>
             {(aiResponded || showTodo) && (
               <motion.div
-                className="max-w-3xl mx-auto"
+                className="flex flex-col lg:flex-row gap-6 max-w-7xl mx-auto"
                 initial="hidden"
                 animate="visible"
                 variants={containerVariants}
               >
-                <motion.div
-                  className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-8"
-                  variants={formVariants}
-                  whileHover={{
-                    boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
-                    transition: { duration: 0.3 },
-                  }}
-                >
-                  <motion.h3
-                    className="text-xl font-semibold mb-4"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.4 }}
-                  >
-                    Tambah Hal Positif Hari Ini
-                  </motion.h3>
-                  <form
-                    onSubmit={handleSubmit}
-                    className="flex flex-col sm:flex-row gap-4"
-                  >
-                    <motion.input
-                      type="text"
-                      value={input}
-                      onChange={(e) => setInput(e.target.value)}
-                      placeholder="Hal positif apa hari ini..."
-                      className="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                      whileFocus={{
-                        scale: 1.02,
-                        boxShadow: "0 0 0 3px rgba(59, 130, 246, 0.1)",
-                        transition: { duration: 0.2 },
-                      }}
-                    />
-                    <motion.button
-                      type="submit"
-                      variants={buttonVariants}
-                      whileHover="hover"
-                      whileTap="tap"
-                      className="cursor-pointer bg-gradient-to-r 
-                        from-pink-300 via-pink-500 to-fuchsia-600 
-                        dark:from-red-600 dark:via-red-400 dark:to-neutral-800
-                        text-white px-6 py-3 rounded-xl font-semibold shadow-md 
-                        transition-all duration-300 hover:brightness-110
-                        flex items-center gap-2 justify-center"
-                    >
-                      {editIndex !== null ? (
-                        <>
-                          <CheckCircle2 className="w-4 h-4" />
-                          Update
-                        </>
-                      ) : (
-                        <>
-                          <Plus className="w-4 h-4" />
-                          Tambah
-                        </>
-                      )}
-                    </motion.button>
-                  </form>
-                </motion.div>
-
-                <LayoutGroup>
-                  <motion.ul
-                    className="space-y-3"
-                    variants={containerVariants}
-                    initial="hidden"
-                    animate="visible"
-                  >
-                    <AnimatePresence mode="popLayout">
-                      {todos.map((todo, index) => (
-                        <motion.li
-                          key={todo.id}
-                          layout
-                          variants={itemVariants}
-                          initial="hidden"
-                          animate="visible"
-                          exit="exit"
-                          whileHover={{
-                            scale: 1.02,
-                            boxShadow: "0 8px 25px rgba(0,0,0,0.1)",
-                            transition: { duration: 0.2 },
-                          }}
-                          className="flex justify-between items-center bg-white dark:bg-gray-800 p-4 rounded-lg shadow border border-gray-200 dark:border-gray-700"
-                        >
-                          <div className="flex items-center gap-3">
-                            <motion.div
-                              variants={checkboxVariants}
-                              animate={todo.completed ? "checked" : "unchecked"}
-                            >
-                              <input
-                                type="checkbox"
-                                checked={todo.completed}
-                                onChange={() => toggleComplete(index)}
-                                className="cursor-pointer h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 transition"
-                              />
-                            </motion.div>
-                            <motion.span
-                              className={`${
-                                todo.completed
-                                  ? "line-through text-gray-400"
-                                  : ""
-                              }`}
-                              animate={{
-                                opacity: todo.completed ? 0.6 : 1,
-                                scale: todo.completed ? 0.98 : 1,
-                              }}
-                              transition={{ duration: 0.3 }}
-                            >
-                              {todo.text}
-                            </motion.span>
-                          </div>
-                          <div className="flex gap-2">
-                            <motion.button
-                              onClick={() => handleEdit(index)}
-                              variants={buttonVariants}
-                              whileHover="hover"
-                              whileTap="tap"
-                              className="flex items-center gap-2 px-3 py-2 rounded-md border border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white transition"
-                            >
-                              <PencilLine className="w-4 h-4" />
-                              <span className="text-sm font-medium">Edit</span>
-                            </motion.button>
-
-                            <motion.button
-                              onClick={() => handleDelete(index)}
-                              variants={buttonVariants}
-                              whileHover="hover"
-                              whileTap="tap"
-                              className="flex items-center gap-2 px-3 py-2 rounded-md border border-red-500 text-red-500 hover:bg-red-500 hover:text-white transition"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                              <span className="text-sm font-medium">Hapus</span>
-                            </motion.button>
-                          </div>
-                        </motion.li>
-                      ))}
-                    </AnimatePresence>
-                  </motion.ul>
-                </LayoutGroup>
-
-                {todos.length === 0 && (aiResponded || showTodo) && (
+                {/* Todo List Section */}
+                <div className="w-full lg:w-2/3">
                   <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.5, duration: 0.5 }}
-                    className="text-center py-12 text-gray-500 dark:text-gray-400"
+                    className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-8"
+                    variants={formVariants}
+                    whileHover={{
+                      boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
+                      transition: { duration: 0.3 },
+                    }}
                   >
-                    <motion.div
-                      animate={{
-                        rotate: [0, 10, -10, 0],
-                        scale: [1, 1.1, 1],
-                      }}
-                      transition={{
-                        duration: 2,
-                        repeat: Infinity,
-                        repeatDelay: 3,
-                      }}
-                      className="text-6xl mb-4"
+                    <motion.h3
+                      className="text-xl font-semibold mb-4"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.4 }}
                     >
-                      ✨
-                    </motion.div>
-                    <p className="text-lg">
-                      Belum ada hal positif hari ini. Yuk mulai tambahkan!
-                    </p>
+                      Tambah Hal Positif Hari Ini
+                    </motion.h3>
+                    <form
+                      onSubmit={handleSubmit}
+                      className="flex flex-col sm:flex-row gap-4"
+                    >
+                      <motion.input
+                        type="text"
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        placeholder="Hal positif apa hari ini..."
+                        className="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                        whileFocus={{
+                          scale: 1.02,
+                          boxShadow: "0 0 0 3px rgba(59, 130, 246, 0.1)",
+                          transition: { duration: 0.2 },
+                        }}
+                      />
+                      <motion.button
+                        type="submit"
+                        variants={buttonVariants}
+                        whileHover="hover"
+                        whileTap="tap"
+                        className="cursor-pointer bg-gradient-to-r 
+                          from-pink-300 via-pink-500 to-fuchsia-600 
+                          dark:from-red-600 dark:via-red-400 dark:to-neutral-800
+                          text-white px-6 py-3 rounded-xl font-semibold shadow-md 
+                          transition-all duration-300 hover:brightness-110
+                          flex items-center gap-2 justify-center"
+                      >
+                        {editIndex !== null ? (
+                          <>
+                            <CheckCircle2 className="w-4 h-4" />
+                            Update
+                          </>
+                        ) : (
+                          <>
+                            <Plus className="w-4 h-4" />
+                            Tambah
+                          </>
+                        )}
+                      </motion.button>
+                    </form>
                   </motion.div>
-                )}
+
+                  <LayoutGroup>
+                    <motion.ul
+                      className="space-y-3"
+                      variants={containerVariants}
+                      initial="hidden"
+                      animate="visible"
+                    >
+                      <AnimatePresence mode="popLayout">
+                        {todos.map((todo, index) => (
+                          <motion.li
+                            key={todo.id}
+                            layout
+                            variants={itemVariants}
+                            initial="hidden"
+                            animate="visible"
+                            exit="exit"
+                            whileHover={{
+                              scale: 1.02,
+                              boxShadow: "0 8px 25px rgba(0,0,0,0.1)",
+                              transition: { duration: 0.2 },
+                            }}
+                            className="flex justify-between items-center bg-white dark:bg-gray-800 p-4 rounded-lg shadow border border-gray-200 dark:border-gray-700"
+                          >
+                            <div className="flex items-center gap-3">
+                              <motion.div
+                                variants={checkboxVariants}
+                                animate={
+                                  todo.completed ? "checked" : "unchecked"
+                                }
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={todo.completed}
+                                  onChange={() => toggleComplete(index)}
+                                  className="cursor-pointer h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 transition"
+                                />
+                              </motion.div>
+                              <motion.span
+                                className={`${
+                                  todo.completed
+                                    ? "line-through text-gray-400"
+                                    : ""
+                                }`}
+                                animate={{
+                                  opacity: todo.completed ? 0.6 : 1,
+                                  scale: todo.completed ? 0.98 : 1,
+                                }}
+                                transition={{ duration: 0.3 }}
+                              >
+                                {todo.text}
+                              </motion.span>
+                            </div>
+                            <div className="flex gap-2">
+                              <motion.button
+                                onClick={() => handleEdit(index)}
+                                variants={buttonVariants}
+                                whileHover="hover"
+                                whileTap="tap"
+                                className="flex items-center gap-2 px-3 py-2 rounded-md border border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white transition"
+                              >
+                                <PencilLine className="w-4 h-4" />
+                                <span className="text-sm font-medium">
+                                  Edit
+                                </span>
+                              </motion.button>
+
+                              <motion.button
+                                onClick={() => handleDelete(index)}
+                                variants={buttonVariants}
+                                whileHover="hover"
+                                whileTap="tap"
+                                className="flex items-center gap-2 px-3 py-2 rounded-md border border-red-500 text-red-500 hover:bg-red-500 hover:text-white transition"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                                <span className="text-sm font-medium">
+                                  Hapus
+                                </span>
+                              </motion.button>
+                            </div>
+                          </motion.li>
+                        ))}
+                      </AnimatePresence>
+                    </motion.ul>
+                  </LayoutGroup>
+
+                  {todos.length === 0 && (aiResponded || showTodo) && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.5, duration: 0.5 }}
+                      className="text-center py-12 text-gray-500 dark:text-gray-400"
+                    >
+                      <motion.div
+                        animate={{
+                          rotate: [0, 10, -10, 0],
+                          scale: [1, 1.1, 1],
+                        }}
+                        transition={{
+                          duration: 2,
+                          repeat: Infinity,
+                          repeatDelay: 3,
+                        }}
+                        className="text-6xl mb-4"
+                      >
+                        ✨
+                      </motion.div>
+                      <p className="text-lg">
+                        Belum ada hal positif hari ini. Yuk mulai tambahkan!
+                      </p>
+                    </motion.div>
+                  )}
+                </div>
+
+                {/* AI Assistant Section */}
+                <div className="w-full lg:w-1/3 lg:border-l lg:pl-6 border-gray-300 dark:border-gray-700">
+                  <AIAssistant onAIResponded={() => setAiResponded(true)} />
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
         </div>
       </main>
-      <AIAssistant onAIResponded={() => setAiResponded(true)} />
     </div>
   );
 }
