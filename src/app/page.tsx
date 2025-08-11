@@ -199,7 +199,7 @@ export default function Home() {
           <AnimatePresence>
             {(aiResponded || showTodo) && (
               <motion.div
-                className="flex flex-col lg:flex-row gap-6 max-w-7xl mx-auto px-4 sm:px-8 py-6 items-start"
+                className="flex flex-col sm:flex-wrap lg:flex-row gap-6 max-w-7xl mx-auto px-4 sm:px-8 py-6 items-start"
                 initial="hidden"
                 animate="visible"
                 variants={containerVariants}
