@@ -10,6 +10,7 @@ interface Todo {
   id: string;
   text: string;
   completed: boolean;
+  deadline?: string; // format ISO string
 }
 
 const containerVariants = {
@@ -74,6 +75,7 @@ export default function Home() {
   const [editIndex, setEditIndex] = useState<number | null>(null);
   const [aiResponded, setAiResponded] = useState(false);
   const [showTodo, setShowTodo] = useState(false);
+  const [deadline, setDeadline] = useState("");
 
   useEffect(() => {
     try {
@@ -111,6 +113,7 @@ export default function Home() {
         id: `todo-${Date.now()}`,
         text: input,
         completed: false,
+        deadline: deadline || undefined,
       };
       setTodos([...todos, newTodo]);
     }
@@ -135,7 +138,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-50 dark:bg-neutral-900">
       <main className="max-w-7xl mx-auto px-4 py-12">
         <div className="text-center">
           <AnimatePresence>
@@ -196,18 +199,18 @@ export default function Home() {
           <AnimatePresence>
             {(aiResponded || showTodo) && (
               <motion.div
-                className="flex flex-wrap lg:flex-nowrap gap-6 max-w-7xl mx-auto"
+                className="flex flex-col lg:flex-row gap-6 max-w-7xl mx-auto px-4 sm:px-8 py-6 items-start"
                 initial="hidden"
                 animate="visible"
                 variants={containerVariants}
               >
                 {/* AI Assistant Section (sekarang di kiri & besar) */}
-                <div className="w-full lg:w-2/3 order-1 lg:order-1">
+                <div className="w-full lg:w-1/3 bg-white dark:bg-neutral-800 p-6 rounded-lg shadow border border-gray-200 dark:border-gray-700">
                   <AIAssistant onAIResponded={() => setAiResponded(true)} />
                 </div>
 
                 {/* Todo List Section */}
-                <div className="w-full lg:w-1/3 order-2 lg:order-2 lg:border-l lg:pl-6 border-gray-300 dark:border-gray-700">
+                <div className="w-full lg:w-2/3 bg-white dark:bg-neutral-800 p-6 rounded-lg shadow border border-gray-200 dark:border-gray-700">
                   <motion.div
                     className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-8"
                     variants={formVariants}
@@ -217,13 +220,20 @@ export default function Home() {
                     </motion.h3>
                     <form
                       onSubmit={handleSubmit}
-                      className="flex flex-col sm:flex-row gap-4"
+                      className="flex flex-col gap-4"
                     >
                       <motion.input
                         type="text"
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         placeholder="Hal positif apa hari ini..."
+                        className="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                      />
+
+                      <motion.input
+                        type="datetime-local"
+                        value={deadline}
+                        onChange={(e) => setDeadline(e.target.value)}
                         className="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
                       />
                       <motion.button
@@ -265,7 +275,11 @@ export default function Home() {
                                 className="cursor-pointer h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 transition"
                               />
                               <motion.span
-                                className={`${
+                                className={`text-lg sm:text-xl ${
+                                  todo.completed
+                                    ? "line-through text-gray-400"
+                                    : ""
+                                }${
                                   todo.completed
                                     ? "line-through text-gray-400"
                                     : ""
@@ -274,6 +288,12 @@ export default function Home() {
                               >
                                 {todo.text}
                               </motion.span>
+                              {todo.deadline && (
+                                <div className="text-sm text-gray-500">
+                                  Deadline:{" "}
+                                  {new Date(todo.deadline).toLocaleString()}
+                                </div>
+                              )}
                             </div>
                             <div className="flex gap-2 flex-shrink-0">
                               <motion.button
