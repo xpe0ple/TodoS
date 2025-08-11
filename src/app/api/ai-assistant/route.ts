@@ -1,33 +1,54 @@
 import { NextResponse } from "next/server";
+import Replicate from "replicate";
+
+const replicate = new Replicate({
+  auth: process.env.REPLICATE_API_TOKEN!,
+});
 
 export async function POST(req: Request) {
-  const body = await req.json();
+  const { prompt } = await req.json();
 
-  const response = await fetch(
-    "https://openrouter.ai/api/v1/chat/completions",
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`, // Key aman di backend
-        "Content-Type": "application/json",
+  try {
+    let prediction = await replicate.predictions.create({
+      version: "ibm-granite/granite-3.3-8b-instruct",
+      input: {
+        prompt,
+        system_prompt:
+          "Jawaban kamu harus dipisahkan per baris dan mudah dibaca. Gunakan bullet (-) untuk daftar bahan, dan angka (1., 2., dst) untuk langkah.",
+        max_tokens: 512,
       },
-      body: JSON.stringify({
-        model: "openai/gpt-3.5-turbo",
-        messages: [
-          {
-            role: "user",
-            content: body.prompt,
-          },
-          {
-            role: "system",
-            content:
-              "Jawaban kamu harus dipisahkan per baris dan mudah dibaca. Gunakan bullet (-) untuk daftar bahan, dan angka (1., 2., dst) untuk langkah.",
-          },
-        ],
-      }),
-    }
-  );
+    });
 
-  const data = await response.json();
-  return NextResponse.json(data);
+    // Tunggu sampai prediksi selesai
+    while (
+      prediction.status !== "succeeded" &&
+      prediction.status !== "failed"
+    ) {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      prediction = await replicate.predictions.get(prediction.id);
+    }
+
+    if (prediction.status === "succeeded") {
+      let output = prediction.output;
+
+      if (Array.isArray(output)) {
+        output = output.join("");
+      } else if (typeof output !== "string") {
+        output = JSON.stringify(output);
+      }
+
+      return NextResponse.json({ result: output });
+    } else {
+      return NextResponse.json(
+        { error: "Prediction gagal dijalankan" },
+        { status: 500 }
+      );
+    }
+  } catch (error: any) {
+    console.error("Error di API ai-assistant:", error);
+    return NextResponse.json(
+      { error: error.message || "Error saat panggil Granite AI" },
+      { status: 500 }
+    );
+  }
 }

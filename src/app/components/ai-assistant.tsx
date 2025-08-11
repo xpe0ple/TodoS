@@ -13,39 +13,55 @@ export default function AIAssistant({
   const [isTyping, setIsTyping] = useState(false);
 
   const simulateAIResponse = (fullText: string) => {
-    const lines = fullText.split("\n"); // Pisahkan berdasarkan baris
+    console.log("simulateAIResponse dipanggil dengan:", fullText);
+    const lines = fullText.split("\n");
     let index = 0;
     setIsTyping(true);
-    setCurrentLines([]); // Clear dulu
+    setCurrentLines([]);
 
     const interval = setInterval(() => {
-      setCurrentLines((prev) => [...prev, lines[index]]);
+      setCurrentLines((prev) => {
+        const newLines = [...prev, lines[index]];
+        console.log("update currentLines:", newLines);
+        return newLines;
+      });
       index++;
       if (index >= lines.length) {
         clearInterval(interval);
         setIsTyping(false);
-        onAIResponded(); // AI selesai merespon
+        onAIResponded();
       }
-    }, 800); // jeda antar baris
+    }, 800);
   };
 
   const handleSend = async () => {
     if (!input.trim()) return;
 
-    const res = await fetch("/api/ai-assistant", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ prompt: input }),
-    });
+    try {
+      const res = await fetch("/api/ai-assistant", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: input }),
+      });
 
-    const data = await res.json();
-    const content =
-      data.choices?.[0]?.message?.content || "No response from AI";
+      const data = await res.json();
 
-    simulateAIResponse(content); // animasi per baris
-    setInput(""); // kosongkan input
+      const content = data.result || "No response from AI";
+
+      if (typeof content !== "string") {
+        console.error("Response AI bukan string:", content);
+        setCurrentLines(["Response AI tidak berbentuk teks"]);
+        setIsTyping(false);
+        return;
+      }
+      console.log("AI response content:", content);
+      simulateAIResponse(content);
+      setInput("");
+    } catch (err) {
+      console.error("Error saat fetch API AI:", err);
+      setCurrentLines(["Gagal mengambil response AI"]);
+      setIsTyping(false);
+    }
   };
 
   return (
