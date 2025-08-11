@@ -124,12 +124,14 @@ export default function AIAssistant({
           <span className="font-semibold text-blue-600 dark:text-blue-400">
             AI:
           </span>
-          <div className="whitespace-pre-wrap leading-relaxed mt-2">
-            {currentLines.map((line, i) => (
-              <p key={i} className="mb-1">
-                {line.trim() === "" ? "\u00A0" : line}
-              </p>
-            ))}
+          <div className="mt-2">
+            {currentLines
+              .filter((l) => typeof l === "string")
+              .map((line, i) => (
+                <p key={i} className="mb-1">
+                  {line.trim() === "" ? "\u00A0" : line.trim()}
+                </p>
+              ))}
           </div>
         </div>
       )}
