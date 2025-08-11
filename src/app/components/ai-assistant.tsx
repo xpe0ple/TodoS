@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
 
 export default function AIAssistant({
   onAIResponded,
@@ -12,19 +11,37 @@ export default function AIAssistant({
   const [currentLines, setCurrentLines] = useState<string[]>([]);
   const [isTyping, setIsTyping] = useState(false);
 
+  // Fungsi normalisasi teks agar rapi
+  const normalizeText = (text: string) => {
+    return text
+      .split("\n")
+      .map((line) => {
+        // Hapus spasi ganda di tengah, depan & belakang
+        let cleaned = line.replace(/\s+/g, " ").trim();
+
+        // Perbaiki format penomoran
+        cleaned = cleaned.replace(/^(\d+)\s*\.\s*/, "$1. ");
+
+        // Perbaiki format bullet list
+        cleaned = cleaned.replace(/^-\s+/, "- ");
+
+        return cleaned;
+      })
+      .join("\n");
+  };
+
+  // Fungsi untuk simulasi AI mengetik satu per satu baris
   const simulateAIResponse = (fullText: string) => {
     console.log("simulateAIResponse dipanggil dengan:", fullText);
+
     const lines = fullText.split("\n");
+
     let index = 0;
     setIsTyping(true);
     setCurrentLines([]);
 
     const interval = setInterval(() => {
-      setCurrentLines((prev) => {
-        const newLines = [...prev, lines[index]];
-        console.log("update currentLines:", newLines);
-        return newLines;
-      });
+      setCurrentLines((prev) => [...prev, lines[index]]);
       index++;
       if (index >= lines.length) {
         clearInterval(interval);
@@ -34,6 +51,7 @@ export default function AIAssistant({
     }, 800);
   };
 
+  // Fungsi kirim prompt ke API
   const handleSend = async () => {
     if (!input.trim()) return;
 
@@ -45,7 +63,6 @@ export default function AIAssistant({
       });
 
       const data = await res.json();
-
       const content = data.result || "No response from AI";
 
       if (typeof content !== "string") {
@@ -54,8 +71,12 @@ export default function AIAssistant({
         setIsTyping(false);
         return;
       }
+
       console.log("AI response content:", content);
-      simulateAIResponse(content);
+
+      // Normalisasi teks sebelum ditampilkan
+      simulateAIResponse(normalizeText(content));
+
       setInput("");
     } catch (err) {
       console.error("Error saat fetch API AI:", err);
@@ -72,8 +93,8 @@ export default function AIAssistant({
 
       <form
         onSubmit={(e) => {
-          e.preventDefault(); // mencegah reload halaman
-          handleSend(); // jalankan handleSend
+          e.preventDefault();
+          handleSend();
         }}
         className="flex flex-col sm:flex-row gap-4 mb-4"
       >
@@ -87,25 +108,27 @@ export default function AIAssistant({
         <button
           type="submit"
           className="cursor-pointer 
-    bg-gradient-to-r 
-    from-pink-300 via-pink-500 to-fuchsia-600 
-    dark:from-red-600 dark:via-red-400 dark:to-neutral-800
-    hover:brightness-110
-    text-white px-6 py-3 rounded-xl font-semibold 
-    shadow-md transition-all duration-300"
+            bg-gradient-to-r 
+            from-pink-300 via-pink-500 to-fuchsia-600 
+            dark:from-red-600 dark:via-red-400 dark:to-neutral-800
+            hover:brightness-110
+            text-white px-6 py-3 rounded-xl font-semibold 
+            shadow-md transition-all duration-300"
         >
           🚀 Kirim
         </button>
       </form>
 
       {currentLines.length > 0 && (
-        <div className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 mt-2 text-sm transition-all whitespace-pre-line">
+        <div className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 mt-2 text-sm transition-all whitespace-pre-wrap">
           <span className="font-semibold text-blue-600 dark:text-blue-400">
             AI:
           </span>
-          <div className="mt-2">
+          <div className="whitespace-pre-wrap leading-relaxed mt-2">
             {currentLines.map((line, i) => (
-              <p key={i}>{line}</p>
+              <p key={i} className="mb-1">
+                {line.trim() === "" ? "\u00A0" : line}
+              </p>
             ))}
           </div>
         </div>

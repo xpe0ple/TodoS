@@ -14,12 +14,11 @@ export async function POST(req: Request) {
       input: {
         prompt,
         system_prompt:
-          "Jawaban kamu harus dipisahkan per baris dan mudah dibaca. Gunakan bullet (-) untuk daftar bahan, dan angka (1., 2., dst) untuk langkah.",
+          "Jawaban kamu harus dipisahkan per baris dan mudah dibaca. Gunakan bullet (-) untuk daftar bahan, dan angka (1., 2., dst) untuk langkah. Gunakan hanya 1 baris kosong antar poin.",
         max_tokens: 512,
       },
     });
 
-    // Tunggu sampai prediksi selesai
     while (
       prediction.status !== "succeeded" &&
       prediction.status !== "failed"
@@ -32,23 +31,34 @@ export async function POST(req: Request) {
       let output = prediction.output;
 
       if (Array.isArray(output)) {
-        output = output.join("");
+        output = output.join(""); // jangan kasih spasi tambahan
       } else if (typeof output !== "string") {
         output = JSON.stringify(output);
       }
 
-      return NextResponse.json({ result: output });
+      // Rapikan: hilangkan spasi ganda antar kata, tapi tetap pertahankan baris kosong
+      const formattedOutput = output
+        .split("\n")
+        .map(
+          (line: string) => line.trim().replace(/\s+/g, " ") // ganti spasi ganda jadi 1
+        )
+        .join("\n");
+
+      return NextResponse.json({ result: formattedOutput });
     } else {
       return NextResponse.json(
         { error: "Prediction gagal dijalankan" },
         { status: 500 }
       );
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error di API ai-assistant:", error);
-    return NextResponse.json(
-      { error: error.message || "Error saat panggil Granite AI" },
-      { status: 500 }
-    );
+
+    let message = "Error saat panggil Granite AI";
+    if (error instanceof Error) {
+      message = error.message;
+    }
+
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
